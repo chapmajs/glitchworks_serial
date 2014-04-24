@@ -1,7 +1,6 @@
 /*
- * Write disks to a Cromemco 4FDC.
+ * A test driver for glitchworks_serial
  */
-
 #include <sys/types.h>
 #include <stdio.h>
 #include <fcntl.h>
