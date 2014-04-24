@@ -17,5 +17,6 @@
  */
 
 int open_port(char *port, int speed);
-int close_port(char **port);
+int close_port(char *port);
 void write_byte(char byte);
+char read_byte();

@@ -156,3 +156,23 @@ int open_port (char *port, int speed) {
   return set_speed(speed);
 }
 
+/*
+ * write_byte -- write a byte to the port
+ *
+ * Writes a single byte to the serial port. Port must be opened and initialized
+ */
+void write_byte(char byte) {
+  write(portfd, &byte, 1);
+}
+
+/*
+ * read_byte -- read a byte from the port
+ * 
+ * Reads a single byte from the serial port. Port must be opened and
+ * initalized. Blocks until a byte is available.
+ */
+char read_byte() {
+  char in;
+  read(portfd, &in, 1);
+  return(in);
+}
