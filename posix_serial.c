@@ -135,11 +135,15 @@ int set_speed (int speed) {
  * speed: integer serial port speed
  */
 int open_port (char *port, int speed) {
-  portfd = open(port, O_RDWR);
+  printf("Opening port %s ...\n", port);
+  
+  portfd = open(port, O_RDWR | O_NOCTTY | O_NDELAY);
 
   if (portfd == -1) {
     return -1;
   }
+
+  fcntl(portfd, F_SETFL, 0);
 
   int termios_result = save_termios();
 
@@ -161,8 +165,26 @@ int open_port (char *port, int speed) {
  *
  * Writes a single byte to the serial port. Port must be opened and initialized
  */
-void write_byte(char byte) {
+void write_byte (char byte) {
   write(portfd, &byte, 1);
+}
+
+/*
+ * write_string -- write a string to the port
+ *
+ * Writes a NULL-terminated string to the serial port.
+ */
+void write_string (char *string) {
+  write(portfd, string, strlen(string));
+}
+
+/*
+ * write_bytes -- write (length) bytes to the port
+ * 
+ * Writes (length) bytes to the serial port.
+ */
+void write_bytes (char *bytes, int length) {
+  write(portfd, bytes, length);
 }
 
 /*
@@ -171,8 +193,27 @@ void write_byte(char byte) {
  * Reads a single byte from the serial port. Port must be opened and
  * initalized. Blocks until a byte is available.
  */
-char read_byte() {
+char read_byte () {
+  struct termios t;
+  tcgetattr(portfd, &t);
+  t.c_cc[VMIN] = 1;
+  tcsetattr(portfd, TCSANOW, &t);
+  
   char in;
   read(portfd, &in, 1);
   return(in);
+}
+
+/* read_bytes -- read (length) bytes from the port into a buffer
+ *
+ * Reads (length) bytes into the buffer pointed to by *bytes. Set termios
+ * VMIN to prevent timeout on input read. Restore before exiting.
+ */
+void read_bytes (char *bytes, int length) {
+  struct termios t;
+  tcgetattr(portfd, &t);
+  t.c_cc[VMIN] = length;
+  tcsetattr(portfd, TCSANOW, &t);
+  
+  read(portfd, bytes, length);
 }

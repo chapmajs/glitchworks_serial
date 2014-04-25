@@ -21,3 +21,8 @@ Since serial communication is radically different between the supported platform
 * Variable word length
 
 At this time, only bytewise serial communications are being implemented. Supported speed/baudrates are limited to those supported by all target platforms. A single serial port is supported per instance.
+
+Examples
+--------
+
+See `driver.c` for example usage of the libaray. Run `make posix_test` to build the driver program with the POSIX libraries.

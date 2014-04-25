@@ -1,26 +1,36 @@
 /*
  * A test driver for glitchworks_serial
  */
-#include <sys/types.h>
 #include <stdio.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
 
 #include "glitchworks_serial.h"
 
 int main(int argc, char *argv[]) {
-  char test[] = "/dev/ttyUSB0";
-  char *test_ptr = test;
-  printf("Open port result: %d\n", open_port(test_ptr, 9600));
+  if (open_port("/dev/ttyUSB0", 9600) == -1) {
+    fprintf(stderr, "Failed to open serial port!\n");
+    return(-1);
+  }
+ 
+  /* write a single char out */
+  write_byte('*');
+
+  /* write a NULL-terminated string */
+  write_string("Testing string writer...\r\n");
   
-  write_byte('W');
+  /* write as much as a byte array as specified */
+  write_bytes("You'll see A\r\nBut not B\r\n", 14);
   
-  char in = read_byte();
-  printf("Got character: %c\n", in);
+  printf("\n>>> Now type 11 characters on the serial device!\n");
+
+  /* get one char from the port, block until it's read */
+  printf("Got single character: %c\n", read_byte());
+
+  char input_buffer[11];
   
-  exit(0);
+  /* read n bytes from the port into a buffer */
+  read_bytes(input_buffer, 10);
+  input_buffer[10] = 0x00;
+  printf("Got 10 characters: %s\n", input_buffer);
+  
+  return(0);
 }
